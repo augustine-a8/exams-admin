@@ -1,1 +1,6 @@
 @import "tailwindcss";
+
+img {
+  display: block;
+  max-width: 100%;
+}
