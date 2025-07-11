@@ -5,11 +5,16 @@ import "./index.css";
 import { Login } from "./pages";
 import ApolloWrapper from "./utils/apolloWrapper";
 import { AuthProvider } from "./context";
+import App from "./App";
 
 const router = createBrowserRouter([
   {
     path: "/login",
     element: <Login />,
+  },
+  {
+    path: "/",
+    element: <App />,
   },
 ]);
 

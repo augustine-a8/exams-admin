@@ -69,7 +69,6 @@ export default function Login() {
           </div>
 
           <form
-            action="#"
             className="flex flex-col gap-4 lg:gap-6"
             onSubmit={(e) => {
               e.preventDefault();
