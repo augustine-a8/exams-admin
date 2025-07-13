@@ -5,8 +5,10 @@ export default function App() {
   return (
     <>
       <Navbar />
-      <div>
-        <Outlet />
+      <div className="bg-[#f8f9fa] h-[calc(100vh-5.5rem)] overflow-hidden">
+        <div className="container mx-auto">
+          <Outlet />
+        </div>
       </div>
     </>
   );

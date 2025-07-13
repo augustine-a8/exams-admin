@@ -2,7 +2,7 @@ import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { createBrowserRouter, RouterProvider } from "react-router";
 import "./index.css";
-import { Login } from "./pages";
+import { Login, Signature } from "./pages";
 import ApolloWrapper from "./utils/apolloWrapper";
 import { AuthProvider } from "./context";
 import App from "./App";
@@ -15,6 +15,12 @@ const router = createBrowserRouter([
   {
     path: "/",
     element: <App />,
+    children: [
+      {
+        path: "remuneration/signatures",
+        element: <Signature />,
+      },
+    ],
   },
 ]);
 

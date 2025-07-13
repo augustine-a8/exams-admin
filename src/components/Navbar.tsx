@@ -56,7 +56,7 @@ export default function Navbar() {
   }, [remunerationDropdownRef]);
 
   return (
-    <nav className="h-22 w-[100vw] grid place-items-center">
+    <nav className="h-22 w-[100vw] grid place-items-center border-b border-b-gray-300 shadow-lg">
       <div className="flex flex-row items-center justify-between w-[90%]">
         <div className="w-16 h-16">
           <img
@@ -116,7 +116,7 @@ export default function Navbar() {
                 className={`bg-white rounded-lg p-1.5 absolute -left-10 -right-10 top-[calc(100%+10px)] ${customShadow}`}
               >
                 <li className="py-2 px-4 rounded-md hover:cursor-pointer hover:bg-gray-100 font-medium">
-                  <NavLink to={""}>
+                  <NavLink to={"/remuneration/signatures"}>
                     <p>Signatures</p>
                   </NavLink>
                 </li>
