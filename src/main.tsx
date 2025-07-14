@@ -6,6 +6,7 @@ import { Login, Signature } from "./pages";
 import ApolloWrapper from "./utils/apolloWrapper";
 import { AuthProvider } from "./context";
 import App from "./App";
+import { ProtectedPage } from "./components";
 
 const router = createBrowserRouter([
   {
@@ -14,7 +15,11 @@ const router = createBrowserRouter([
   },
   {
     path: "/",
-    element: <App />,
+    element: (
+      <ProtectedPage>
+        <App />
+      </ProtectedPage>
+    ),
     children: [
       {
         path: "remuneration/signatures",

@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { ClipLoader } from "react-spinners";
+import { useNavigate } from "react-router";
 import { SIGN_IN_ADMIN } from "../api";
 import { cn } from "../utils/cn";
 import { useAuth } from "../hooks";
@@ -8,6 +9,8 @@ import { useAuth } from "../hooks";
 export default function Login() {
   const emailRef: React.Ref<HTMLInputElement> | undefined = useRef(null);
   const passwordRef: React.Ref<HTMLInputElement> | undefined = useRef(null);
+
+  const navigate = useNavigate();
 
   const [emailError, setEmailError] = useState<boolean>(false);
   const [passwordError, setPasswordError] = useState<boolean>(false);
@@ -46,6 +49,7 @@ export default function Login() {
       .then(({ data }) => {
         const token = data.signInAdministrator.token;
         login(token);
+        navigate("/", { replace: true });
       })
       .catch((err) => {
         console.error(err);
