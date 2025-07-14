@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { useMutation } from "@apollo/client";
 import { ClipLoader } from "react-spinners";
-import { SIGN_IN_ADMIN } from "../graphql/mutation";
+import { SIGN_IN_ADMIN } from "../api";
 import { cn } from "../utils/cn";
 import { useAuth } from "../hooks";
 
