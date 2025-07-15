@@ -1,49 +1,18 @@
 import { useEffect, useRef, useState } from "react";
 import { cn } from "../utils/cn";
-
-const Rooms = [
-  { name: "LT", id: "6318a99a440810c85abaeb04" },
-  { name: "304", id: "6318a99a440810c85abaeb09" },
-  { name: "PB212", id: "6318a99a440810c85abaeb13" },
-  { name: "RMA", id: "6318a99a440810c85abaeb05" },
-  { name: "PB001", id: "6318a99a440810c85abaeb0c" },
-  { name: "PB201", id: "6318a99a440810c85abaeb11" },
-  { name: "PB214", id: "6318a99a440810c85abaeb12" },
-  { name: "N2", id: "6318a99a440810c85abaeb16" },
-  { name: "ECR", id: "6318a99a440810c85abaeb18" },
-  { name: "PB020", id: "6318a99a440810c85abaeb0d" },
-  { name: "N1", id: "6318a99a440810c85abaeb15" },
-  { name: "VSLA", id: "6318a99a440810c85abaeb0b" },
-  { name: "PB208", id: "6318a99a440810c85abaeb14" },
-  { name: "EA", id: "6318a99a440810c85abaeb19" },
-  { name: "NEB-FF1", id: "6318a99a440810c85abaeb1c" },
-  { name: "RMB", id: "6318a99a440810c85abaeb06" },
-  { name: "PB012", id: "6318a99a440810c85abaeb0f" },
-  { name: "PB008", id: "6318a99a440810c85abaeb10" },
-  { name: "A110", id: "6318a99a440810c85abaeb1a" },
-  { name: "NAF1", id: "6318a99a440810c85abaeb1e" },
-  { name: "303", id: "6318a99a440810c85abaeb08" },
-  { name: "206", id: "6318a99a440810c85abaeb07" },
-  { name: "PB014", id: "6318a99a440810c85abaeb0e" },
-  { name: "VCR", id: "6318a99a440810c85abaeb17" },
-  { name: "NEB-GF", id: "6318a99a440810c85abaeb0a" },
-  { name: "NEB-FF2", id: "6318a99a440810c85abaeb1d" },
-  { name: "NEB-SF", id: "63ea826efae905b39edf455b" },
-  { name: "Computer Based", id: "6432c62ad5b7e2b7f2146a95" },
-  { name: "GIS Lab", id: "64a04f7a77cd2a4195dd5899" },
-  { name: "NEB-TF", id: "64cfc1a594d8a563f04a1ffe" },
-];
+import type { IRoom } from "../types";
 
 interface RoomPickerProps {
-  onRoomRangeChange: (room: { name: string; id: string }) => void;
+  rooms: IRoom[];
+  onRoomRangeChange: (room: IRoom) => void;
 }
 
-const RoomPicker: React.FC<RoomPickerProps> = ({ onRoomRangeChange }) => {
+const RoomPicker: React.FC<RoomPickerProps> = ({
+  rooms,
+  onRoomRangeChange,
+}) => {
   const [showDropdown, setShowDropdown] = useState<boolean>(false);
-  const [selectedRoom, setSelectedRoom] = useState<{
-    name: string;
-    id: string;
-  } | null>(null);
+  const [selectedRoom, setSelectedRoom] = useState<IRoom | null>(null);
 
   const dropdownRef = useRef<HTMLDivElement>(null);
   const dropdownButtonRef = useRef<HTMLButtonElement>(null);
@@ -104,12 +73,12 @@ const RoomPicker: React.FC<RoomPickerProps> = ({ onRoomRangeChange }) => {
               <i className="ri-search-line text-[#495057] flex-shrink-0"></i>
             </div>
             <div className="max-h-[250px] overflow-y-auto">
-              {Rooms.map((room) => {
-                const { id, name } = room;
+              {rooms.map((room: IRoom) => {
+                const { _id, name } = room;
 
                 return (
                   <div
-                    key={id}
+                    key={_id}
                     className="px-4 py-2 hover:cursor-pointer hover:bg-[#e9ecef]"
                     role="button"
                     onClick={() => {

@@ -1,14 +1,65 @@
 import { DatePicker, RoomPicker } from "../components";
-import Signatures from "../../public/signatures.json";
+import { useQuery } from "@apollo/client";
+import { GET_ALL_ROOMS, GET_SIGNATURES } from "../api";
+import { useState } from "react";
+import { ClipLoader } from "react-spinners";
+import type { IRoom, ISignature } from "../types";
 
 export default function Signature() {
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
+
+  const {
+    data: getSignaturesData,
+    loading: getSignaturesLoading,
+    error: getSignaturesError,
+  } = useQuery(GET_SIGNATURES, {
+    variables: { pageNumber, itemsPerPage },
+  });
+
+  const {
+    data: getAllRoomsData,
+    loading: getAllRoomsLoading,
+    error: getAllRoomsError,
+  } = useQuery(GET_ALL_ROOMS);
+
   const handleDateRangeChange = (from: Date | null, to: Date | null) => {
     console.log("Selected Date Range:", { from, to });
   };
 
-  const handleRoomChange = (room: { name: string; id: string }) => {
+  const handleRoomChange = (room: IRoom) => {
     console.log("Selected Room: ", room);
   };
+
+  if (getSignaturesLoading || getAllRoomsLoading) {
+    return (
+      <div className="w-full h-full grid place-items-center">
+        <ClipLoader size={24} color="black" />
+      </div>
+    );
+  }
+
+  if (getSignaturesError || getAllRoomsError) {
+    return (
+      <div className="w-full h-full grid place-items-center">
+        {getSignaturesError && (
+          <p className="text-red-500 font-medium text-center">
+            {getSignaturesError.message}
+          </p>
+        )}
+        {getAllRoomsError && (
+          <p className="text-red-500 font-medium text-center">
+            {getAllRoomsError.message}
+          </p>
+        )}
+      </div>
+    );
+  }
+
+  const signatures = getSignaturesData.getSignatures.signatures;
+  const pageInfo = getSignaturesData.getSignatures.pageInfo;
+
+  const rooms: IRoom[] = getAllRoomsData.getAllRooms;
 
   return (
     <div>
@@ -48,7 +99,7 @@ export default function Signature() {
               <DatePicker onDateRangeChange={handleDateRangeChange} />
             </div>
             <div className="min-w-[150px]">
-              <RoomPicker onRoomRangeChange={handleRoomChange} />
+              <RoomPicker rooms={rooms} onRoomRangeChange={handleRoomChange} />
             </div>
           </div>
         </div>
@@ -78,7 +129,7 @@ export default function Signature() {
               </tr>
             </thead>
             <tbody className="w-full table-fixed block max-h-[calc(100vh-30.75rem)] overflow-y-auto">
-              {Signatures.map((signature) => {
+              {signatures.map((signature: ISignature) => {
                 const { _id, user, room, session, signedAt, duration } =
                   signature;
 
@@ -112,9 +163,10 @@ export default function Signature() {
           <div className="flex items-center justify-between px-6 py-4 border-t border-t-gray-300">
             <div>
               <p className="text-gray-500 text-sm">
-                Showing <span className="font-semibold">1</span> to{" "}
-                <span className="font-semibold">10</span> of{" "}
-                <span className="font-semibold">90</span> Signatures
+                Showing <span className="font-semibold">{pageInfo.start}</span>{" "}
+                to <span className="font-semibold">{pageInfo.end}</span> of{" "}
+                <span className="font-semibold">{pageInfo.total}</span>{" "}
+                Signatures
               </p>
             </div>
             <div>
@@ -160,7 +212,13 @@ export default function Signature() {
                 name="go_to_page"
                 id="go_to_page"
                 min={1}
-                defaultValue={1}
+                value={pageNumber}
+                onChange={(e) => {
+                  const newPageNumber = Number(e.target.value);
+                  if (newPageNumber > 0) {
+                    setPageNumber(newPageNumber);
+                  }
+                }}
                 className="ring-1 ring-gray-300 rounded-md w-20 px-2 py-1 outline-0"
               />
             </div>

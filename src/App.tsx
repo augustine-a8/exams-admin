@@ -6,7 +6,7 @@ export default function App() {
     <>
       <Navbar />
       <div className="bg-[#f8f9fa] h-[calc(100vh-5.5rem)] overflow-hidden">
-        <div className="container mx-auto">
+        <div className="container mx-auto w-full h-full">
           <Outlet />
         </div>
       </div>
