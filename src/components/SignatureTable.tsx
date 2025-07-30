@@ -1,151 +1,54 @@
-import { DatePicker, RoomPicker } from "../components";
-import { useMutation, useQuery } from "@apollo/client";
-import { FILTER_SIGNATURES, GET_ALL_ROOMS } from "../api";
-import { useEffect, useRef, useState } from "react";
+import type { ApolloError } from "@apollo/client";
+import type { IRoom, ISignature, ISignatureConnection } from "../types";
 import { ClipLoader } from "react-spinners";
-import type { IRoom, ISignature } from "../types";
+import DatePicker from "./DatePicker";
+import RoomPicker from "./RoomPicker";
 
-type FilterSignatureOptions = {
-  fromDate: string | null;
-  toDate: string | null;
-  roomId: string | null;
-};
+interface ISignatureTable {
+  signatureConnection: ISignatureConnection;
+  loading: boolean;
+  error: ApolloError | undefined;
+  pageNumber: number;
+  rooms: IRoom[];
+  setPageNumber: React.Dispatch<React.SetStateAction<number>>;
+  handleDateRangeChange: (from: Date | null, to: Date | null) => void;
+  handleRoomChange: (room: IRoom) => void;
+}
 
-type DateRange = {
-  fromDate: string | null;
-  toDate: string | null;
-};
-
-export default function Signature() {
-  const [pageNumber, setPageNumber] = useState<number>(1);
-  const [itemsPerPage, setItemsPerPage] = useState<number>(10);
-
-  const [dateRange, setDateRange] = useState<DateRange>({
-    fromDate: null,
-    toDate: null,
-  });
-  const [selectedRoom, setSelectedRoom] = useState<IRoom | null>(null);
-  const [examSupport, setExamSupport] = useState<string>("");
-  const searchInputRef = useRef<HTMLInputElement>(null);
-
-  // const {
-  //   data: getPaginatedSignaturesData,
-  //   loading: getPaginatedSignaturesLoading,
-  //   error: getPaginatedSignaturesError,
-  // } = useQuery(GET_PAGINATED_SIGNATURES, {
-  //   variables: { pageNumber, itemsPerPage },
-  // });
-
-  const {
-    data: getAllRoomsData,
-    loading: getAllRoomsLoading,
-    error: getAllRoomsError,
-  } = useQuery(GET_ALL_ROOMS);
-
-  const [
-    filterSignatures,
-    {
-      data: filterSignaturesData,
-      loading: filterSignaturesLoading,
-      error: filterSignaturesError,
-    },
-  ] = useMutation(FILTER_SIGNATURES);
-
-  const handleDateRangeChange = (from: Date | null, to: Date | null) => {
-    if (from && to) {
-      setDateRange({
-        fromDate: from.toISOString(),
-        toDate: to.toISOString(),
-      });
-    }
-  };
-
-  const handleRoomChange = (room: IRoom) => {
-    setSelectedRoom(room);
-  };
-
-  const handleFilterSignatures = () => {
-    const filterOptions: FilterSignatureOptions = {
-      fromDate: dateRange.fromDate,
-      toDate: dateRange.toDate,
-      roomId: selectedRoom ? selectedRoom._id : null,
-    };
-
-    const examSupport = searchInputRef.current?.value
-      ? searchInputRef.current.value
-      : "";
-
-    console.log({ examSupport, filterOptions, pageNumber, itemsPerPage });
-
-    filterSignatures({
-      variables: { examSupport, filterOptions, pageNumber, itemsPerPage },
-    })
-      .then(({ data }) => {
-        console.log("Filter Signatures Successful");
-        console.log({ filteredSignatures: data.filterSignatures });
-      })
-      .catch((err) => {
-        console.log("Filter Signatures Error");
-        console.log(err);
-      });
-  };
-
-  useEffect(() => {
-    handleFilterSignatures();
-  }, [dateRange, selectedRoom]);
-
-  const isLoading = filterSignaturesLoading || getAllRoomsLoading;
-  const pageError = filterSignaturesError || getAllRoomsError;
-
-  if (isLoading) {
+const SignatureTable: React.FC<ISignatureTable> = ({
+  signatureConnection,
+  rooms,
+  loading,
+  error,
+  pageNumber,
+  setPageNumber,
+  handleDateRangeChange,
+  handleRoomChange,
+}) => {
+  if (error) {
     return (
-      <div className="w-full h-full grid place-items-center">
+      <div className="text-center text-red-500">
+        <p>Error loading page data:</p>
+        <p>{error.message}</p>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div>
         <ClipLoader size={24} color="black" />
       </div>
     );
   }
 
-  if (pageError) {
-    return (
-      <div className="w-full h-full grid place-items-center">
-        <p className="text-red-500 font-medium text-center">
-          {pageError.message}
-        </p>
-      </div>
-    );
-  }
-
-  console.log(filterSignaturesData);
-
-  const signatures = filterSignaturesData.filterSignatures.signatures;
-  const pageInfo = filterSignaturesData.filterSignatures.pageInfo;
-
-  const rooms: IRoom[] = getAllRoomsData.getAllRooms;
+  const signatures = signatureConnection.signatures;
+  const pageInfo = signatureConnection.pageInfo;
 
   return (
-    <div>
-      <div className="flex flex-row items-center justify-between lg:py-10">
-        <div>
-          <p className="text-2xl font-medium lg:mb-4">
-            Signed Invigilator Records
-          </p>
-          <p className="w-[70%] text-sm text-gray-500">
-            A comprehensive log of invigilator signatures, detailing the date of
-            signature, the invigilated session, and the corresponding
-            examination room.
-          </p>
-        </div>
-        <div>
-          <button>
-            <div className="border border-gray-500 rounded-full px-4 py-2 hover:cursor-pointer hover:bg-black hover:text-white duration-200">
-              <p>Export all data</p>
-            </div>
-          </button>
-        </div>
-      </div>
-
+    <>
       <div className="bg-white border border-gray-300 shadow-lg rounded-xl">
-        {/* <div className="flex flex-row items-center justify-between p-4 border-b border-b-gray-300">
+        <div className="flex flex-row items-center justify-between p-4 border-b border-b-gray-300">
           <div className="border border-gray-200 rounded-md flex flex-row px-2 py-1 gap-1">
             <i className="ri-search-line text-gray-300"></i>
             <input
@@ -285,8 +188,10 @@ export default function Signature() {
               />
             </div>
           </div>
-        </div> */}
+        </div>
       </div>
-    </div>
+    </>
   );
-}
+};
+
+export default SignatureTable;

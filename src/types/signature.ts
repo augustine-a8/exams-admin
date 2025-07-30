@@ -1,3 +1,5 @@
+import type { PageInfo } from "./pageInfo";
+
 export type ISignature = {
   _id: string;
   imageUrl: string;
@@ -13,4 +15,9 @@ export type ISignature = {
   session: number;
   duration: number;
   signedAt: string;
+};
+
+export type ISignatureConnection = {
+  signatures: ISignature[];
+  pageInfo: PageInfo;
 };
